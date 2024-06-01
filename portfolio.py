@@ -1,9 +1,10 @@
+
 import pandas as pd
 
 class Portfolio:
     def __init__(self, allocation):
         self.allocation = allocation
-        self.cash = 10000000  # Initial cash
+        self.cash = 10000000  
         self.holdings = {}
         self.entry_prices = {}
         self.daily_values = []
@@ -11,10 +12,10 @@ class Portfolio:
         self.history = []
         self.count = {ticker: 0 for ticker in allocation}
         self.transaction_tax = {
-            'securities': 0.003,  # 证券交易税
-            'futures': 0.0025  # 期货交易税
+            'securities': 0.003,  
+            'futures': 0.0025  
         }
-        self.profit_tax_rate = 0.10  # 利润税率
+        self.profit_tax_rate = 0.10  
 
     def update_daily_value(self, date, prices):
         total_value = self.cash
@@ -28,9 +29,9 @@ class Portfolio:
     def buy(self, date, ticker, price, amount):
         cost = price * amount
         tax = 0
-        if 'TWN' in ticker or '00632R.TW' in ticker:  # 期货交易税
+        if 'TWN' in ticker or '00632R.TW' in ticker:  
             tax = cost * self.transaction_tax['futures']
-        else:  # 证券交易税
+        else:  
             tax = cost * self.transaction_tax['securities']
         
         total_cost = cost + tax
@@ -49,9 +50,9 @@ class Portfolio:
         if ticker in self.holdings and self.holdings[ticker] >= amount:
             cost = price * amount
             tax = 0
-            if 'TWN' in ticker or '00632R.TW' in ticker:  # 期货交易税
+            if 'TWN' in ticker or '00632R.TW' in ticker:  
                 tax = cost * self.transaction_tax['futures']
-            else:  # 证券交易税
+            else:  
                 tax = cost * self.transaction_tax['securities']
             
             self.holdings[ticker] -= amount
