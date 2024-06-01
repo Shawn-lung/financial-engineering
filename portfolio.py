@@ -1,4 +1,3 @@
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -11,6 +10,7 @@ class Portfolio:
         self.daily_holdings = []
         self.entry_prices = {}  # 添加 entry_prices 属性
         self.allocation = allocation if allocation else {}  # 初始化配置比例
+        self.count = [0,0,0,0,0,0,0,0,0] #用來計算進場幾次，最多4次(股票部分)
 
     def buy(self, date, ticker, price, amount):
         cost = price * amount
@@ -69,12 +69,20 @@ def trade_logic(data, portfolio):
                 if ticker in portfolio.holdings:
                     entry_price = portfolio.entry_prices.get(ticker, df.loc[date, 'Close'])
                     current_price = df.loc[date, 'Close']
-                    if current_price >= entry_price * 1.05:  # 上漲5%加一倉
-                        amount_to_buy = portfolio.cash * 0.25 / current_price
-                        portfolio.buy(date, ticker, current_price, amount_to_buy)
-                    elif current_price <= entry_price * 0.90:  # 下跌10%加一倉
-                        amount_to_buy = portfolio.cash * 0.25 / current_price
-                        portfolio.buy(date, ticker, current_price, amount_to_buy)
+                    ATR = calculate_indicators(df)['ATR']
+                    if current_price <= current_price-ATR*2:   #退場策略優先於加倉
+                        amount_to_sell = portfolio.daily_holdings / current_price #全部賣出
+                        portfolio.sell(date, ticker, current_price, amount_to_sell)
+                        portfolio.count[ticker] = 0
+                    elif portfolio.count[ticker] < 4:
+                        if current_price >= entry_price * 1.05:  # 上漲5%加一倉
+                            amount_to_buy = portfolio.cash / current_price
+                            portfolio.sell(date, ticker, current_price, amount_to_buy)
+                            portfolio.count[ticker] +=1 
+                        elif current_price <= entry_price * 0.90:  # 下跌10%加一倉
+                            amount_to_buy = portfolio.cash * 0.25 / current_price
+                            portfolio.buy(date, ticker, current_price, amount_to_buy)
+                            portfolio.count[ticker] +=1 
             except KeyError:
                 # 忽略缺失的日期
                 continue
