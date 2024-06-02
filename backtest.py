@@ -6,6 +6,8 @@ from portfolio import Portfolio
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import numpy as np
 
 os.makedirs("data", exist_ok=True)
 
@@ -152,6 +154,21 @@ axs[0].set_title('Portfolio Total Value Over Time')
 axs[0].legend()
 axs[0].grid(True)
 
+# 绘制每年的线性回归趋势线
+daily_values_df['Year'] = daily_values_df['Date'].dt.year
+years = daily_values_df['Year'].unique()
+
+for year in years:
+    yearly_data = daily_values_df[daily_values_df['Year'] == year]
+    if len(yearly_data) > 1:  # 确保有足够的数据点进行回归
+        X = np.array(range(len(yearly_data))).reshape(-1, 1)
+        y = yearly_data['Total Value'].values
+        model = LinearRegression().fit(X, y)
+        trend = model.predict(X)
+        axs[0].plot(yearly_data['Date'], trend, linestyle='--', label=f'{year} Trend')
+
+axs[0].legend()
+axs[0].grid(True)
 
 daily_holdings_df['Date'] = pd.to_datetime(daily_holdings_df['Date'])
 holdings_dict = daily_holdings_df.set_index('Date')['Holdings'].to_dict()
