@@ -1,4 +1,4 @@
-
+# backtest.py
 
 from data_fetcher import get_data
 from indicators import calculate_indicators
@@ -6,7 +6,6 @@ from portfolio import Portfolio
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
-
 
 os.makedirs("data", exist_ok=True)
 
@@ -48,16 +47,16 @@ def trade_logic(data, portfolio):
 
         portfolio.update_daily_value(date, prices)
 
-
-        if not initial_invested:
-            initial_investment = portfolio.cash  
-            for ticker, alloc in portfolio.allocation.items():
-                if prices.get(ticker) is not None:
-                    amount_to_buy = (initial_investment * alloc) / prices[ticker]
-                    portfolio.buy(date, ticker, prices[ticker], amount_to_buy)
-                    print(f"Initial Buy: {amount_to_buy} of {ticker} at {prices[ticker]} on {date}")
-            initial_invested = True
-
+        if not initial_invested and date == pd.Timestamp('2019-05-28'):
+            available_tickers = [ticker for ticker in tickers if prices.get(ticker) is not None]
+            if len(available_tickers) == len(tickers):
+                initial_investment = portfolio.cash  # Use the entire initial cash for allocation
+                for ticker, alloc in portfolio.allocation.items():
+                    if prices.get(ticker) is not None:
+                        amount_to_buy = (initial_investment * alloc) / prices[ticker]
+                        portfolio.buy(date, ticker, prices[ticker], amount_to_buy)
+                        print(f"Initial Buy: {amount_to_buy} of {ticker} at {prices[ticker]} on {date}")
+                initial_invested = True
 
         for ticker in data:
             df = data[ticker]

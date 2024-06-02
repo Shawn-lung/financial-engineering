@@ -1,4 +1,4 @@
-
+#indicatiors.py
 import pandas as pd
 
 def calculate_indicators(df):

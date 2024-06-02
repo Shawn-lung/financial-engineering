@@ -1,4 +1,4 @@
-
+#portfolio.py
 import pandas as pd
 
 class Portfolio:
@@ -13,7 +13,7 @@ class Portfolio:
         self.count = {ticker: 0 for ticker in allocation}
         self.transaction_tax = {
             'securities': 0.003,  
-            'futures': 0.0025  
+            'futures': 0.00002  
         }
         self.profit_tax_rate = 0.10  
 
